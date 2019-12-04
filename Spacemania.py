@@ -149,7 +149,6 @@ class Explosion(pygame.sprite.Sprite) :
 	def update(self) :
 		if(pygame.time.get_ticks()-self.current>self.frame_rate) :
 			self.i+=1
-			print(self.i)
 			if self.i>=len(explosion) :
 				self.kill()
 				return
@@ -343,7 +342,7 @@ class Enemy(pygame.sprite.Sprite):
 
 
 #Load all game graphics
-background = pygame.image.load(os.path.join(asset_folder,"pacman-map2.png"))
+background = pygame.image.load(os.path.join(asset_folder,"map-with-pane.png"))
 background = pygame.transform.scale(background,(Width,Height))
 meteor = pygame.image.load(os.path.join(asset_folder,"meteorBrown_big3.png"))
 laser = pygame.image.load(os.path.join(asset_folder,"laserRed16.png"))
@@ -459,7 +458,6 @@ def gameloop():
 			#print("Yes")
 			if pygame.time.get_ticks()>next_wave_time :
 				#print("No")
-				global allow_next_wave
 				allow_next_wave = False
 				open_gate()
 			draw_text(screen,"Next wave ",18,Width-50,Height/2)
