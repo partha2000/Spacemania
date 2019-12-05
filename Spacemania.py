@@ -129,7 +129,7 @@ def open_gate(): #To open the gate
 
 
 def draw_text(surf,text,size,x,y): #GUI
-	font = pygame.font.Font(font_name,size)
+	font = pygame.font.Font(font_name,int(size))
 	text_surface = font.render(text,True,BLUE)
 	text_rect = text_surface.get_rect()
 	text_rect.midtop = (x,y)
@@ -182,7 +182,7 @@ class Bullets(pygame.sprite.Sprite) :
 		if self.count>8 : #Update the position of the bullet on the map by one unit after every 16 iterations(this depends on the speed of the bullet)
 			self.count = 0 
 			
-		if map[(self.rect.centery+5-6)/17][(self.rect.centerx+5-8)/17]==0 : #Explode the bullet when it hits the boundary
+		if map[int((self.rect.centery+5-6)/17)][int((self.rect.centerx+5-8)/17)]==0 : #Explode the bullet when it hits the boundary
 				explo = Explosion(self.rect.center,20)
 				all_sprites.add(explo)
 				self.kill()
@@ -497,7 +497,7 @@ while intro:
 	screen.blit(background,background_rect)	
 	Button(100,2*Height/3,"PLAY",GREEN,gameloop,100,75)
 	Button(Width-200,2*Height/3,"QUIT",RED,quit,100,75)
-	draw_text(screen,"_SpaceMania",75,Width/2,Height/3-75)
+	draw_text(screen,"SpaceMania",75,Width/2,Height/3-75)
 	pygame.display.flip()
 	clock.tick(FPS)
 pygame.quit()
