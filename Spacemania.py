@@ -15,6 +15,7 @@ Height = 577
 Width = 570
 FPS = 100
 
+#Hard coded grid or play ground on which the pacman is moving formed using extract.cpp on an image. Here 1 indicates trversible and 0 indiates non-traversible region 
 map =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] ,
 [0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0] ,
 [0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0] ,
@@ -47,6 +48,7 @@ map =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] ,
 [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0] ,
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
 
+#Hard coded dots_map to specify at which positions dots are present
 dots_map = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] ,
 [0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0] ,
 [0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0] ,
@@ -81,28 +83,28 @@ dots_map = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] ,
 
 
 #Initialization section
-all_sprites = pygame.sprite.Group()
+all_sprites = pygame.sprite.Group() 
 enemies = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
-blocked_dots = []
+blocked_dots = [] # List of dots that are blocked. These will be blocked in each screen frame
 pygame.init()
-dots_left = 298
-gate_condition = 0
-last_bullet_time = pygame.time.get_ticks()
-next_wave_time = pygame.time.get_ticks()
-allow_next_wave = False
+dots_left = 298 # To store the no of dots left
+gate_condition = 0 # Gate condition : 0 meaning closed and 1 meaning open
+last_bullet_time = pygame.time.get_ticks() 
+next_wave_time = pygame.time.get_ticks() # To store when the next wave of enemies is scheduled
+allow_next_wave = False # Flag variable for next wave 
 
 #Set up the folder for all the assets
 asset_folder = os.path.dirname(__file__);
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((Width,Height))
-pygame.display.set_caption('My Game')
+pygame.display.set_caption('Spacemania')
 
-font_name = pygame.font.match_font('arial')#To find the closest possible match to the name 'arial' 
-moves = [(-1,0),(0,-1),(1,0),(0,1)]
+font_name = pygame.font.match_font('arial') #To find the closest possible match to the name 'arial' 
+moves = [(-1,0),(0,-1),(1,0),(0,1)] #Posible moves of the player as : up, left, down and right
 
-def close_gate():
+def close_gate(): #To close the gate after all the enemies have moved out
 	print("Gate closed , all enemies escaped")
 	global gate_condition
 	global allow_next_wave
@@ -113,7 +115,7 @@ def close_gate():
 	allow_next_wave = True
 
 
-def open_gate():
+def open_gate(): #To open the gate
 	global gate_condition
 	global enclosed_enemies
 	gate_condition = 0
@@ -126,14 +128,14 @@ def open_gate():
 
 
 
-def draw_text(surf,text,size,x,y):
+def draw_text(surf,text,size,x,y): #GUI
 	font = pygame.font.Font(font_name,size)
 	text_surface = font.render(text,True,BLUE)
 	text_rect = text_surface.get_rect()
 	text_rect.midtop = (x,y)
 	surf.blit(text_surface,text_rect)
 
-#To add explosion at the point of collision of the bullet and meteor
+#To add explosion at the specified 'position' of given 'size' 
 class Explosion(pygame.sprite.Sprite) :
 	def __init__(self,position,size):
 		pygame.sprite.Sprite.__init__(self)
@@ -143,17 +145,17 @@ class Explosion(pygame.sprite.Sprite) :
 		self.rect = self.image.get_rect()
 		self.rect.center = position
 		self.current = pygame.time.get_ticks()
-		self.frame_rate = 50
+		self.time_bet_consec_frames = 50
 		self.i = 0
-		print(self.i)
-	def update(self) :
-		if(pygame.time.get_ticks()-self.current>self.frame_rate) :
+		
+	def update(self) : 
+		if(pygame.time.get_ticks()-self.current>self.time_bet_consec_frames) : #Update the frame maintaining the frame_rate
 			self.i+=1
 			if self.i>=len(explosion) :
-				self.kill()
+				self.kill() #Kill the instance after all the frames are over
 				return
 			self.current = pygame.time.get_ticks() 
-			self.image = pygame.transform.scale(explosion[self.i],(self.size,self.size))
+			self.image = pygame.transform.scale(explosion[self.i],(self.size,self.size)) #Show next frame
 			self.rect = self.image.get_rect()
 			self.rect.center = self.pos
 
@@ -162,13 +164,13 @@ class Explosion(pygame.sprite.Sprite) :
 class Bullets(pygame.sprite.Sprite) :
 	def __init__(self,posx,posy,velox,veloy):
 		pygame.sprite.Sprite.__init__(self)
-		if velox==2 : 
+		if velox>0 : #Set the direction of the bullet accordingly
 			self.image = pygame.transform.rotate(pygame.transform.scale(laser,(10,20)),90)
-		if velox==-2 : 
+		if velox<0 : 
 			self.image = pygame.transform.rotate(pygame.transform.scale(laser,(10,20)),-90)
-		if veloy==2 : 
+		if veloy>0 : 
 			self.image = pygame.transform.rotate(pygame.transform.scale(laser,(10,20)),0)
-		if veloy==-2 : 
+		if veloy<0 : 
 			self.image = pygame.transform.rotate(pygame.transform.scale(laser,(10,20)),180)
 		self.rect = self.image.get_rect()
 		self.count = 0
@@ -177,27 +179,29 @@ class Bullets(pygame.sprite.Sprite) :
 		self.vely = veloy
 	def update(self) :
 		self.count += 1
-		if self.count>16 :
-			self.count = 0
-			if map[(self.rect.centery+self.vely*10-6)/17][(self.rect.centerx+self.velx*10-8)/17]==0 :
+		if self.count>8 : #Update the position of the bullet on the map by one unit after every 16 iterations(this depends on the speed of the bullet)
+			self.count = 0 
+			
+		if map[(self.rect.centery+5-6)/17][(self.rect.centerx+5-8)/17]==0 : #Explode the bullet when it hits the boundary
 				explo = Explosion(self.rect.center,20)
 				all_sprites.add(explo)
 				self.kill()
-		self.rect.centery += self.vely
+		self.rect.centery += self.vely #To move the bullet forward in each frame
 		self.rect.centerx += self.velx
 		if self.rect.top < -20 or self.rect.left < 0 or self.rect.right > Width-30 or self.rect.bottom > Height:
-			explo = Explosion(self.rect.center,20)
+			explo = Explosion(self.rect.center,20) #Explode the bullet when the bullet reaches the boundary
 			all_sprites.add(explo)
 			self.kill()
 
 
+#Player class
 class Player(pygame.sprite.Sprite):
 	def __init__(self,velx,vely):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.transform.scale(play,(25,25));
-		self.x = 1
+		self.x = 1 #Initial position of the player
 		self.y = 1
-		self.velocity = (0,0)
+		self.velocity = (0,0) #Initial velocity of the player ship
 		self.rect = self.image.get_rect()
 		self.rect.center = (25,23)
 		self.curr_direction = 0
@@ -208,7 +212,6 @@ class Player(pygame.sprite.Sprite):
 		self.count += 1
 		global dot_left
 		if(self.count>16):
-			#pygame.draw.rect(screen,BLACK,self.rect)
 			if(dots_map[self.y][self.x]) :
 				global dots_left
 				dots_left -=1
@@ -216,7 +219,8 @@ class Player(pygame.sprite.Sprite):
 				dots_map[self.y][self.x] = 0
 			self.count = 0
 			self.curr_direction = direction
-		if(self.curr_direction==0) :self.velocity = (0,0)
+		#Move the player according to its direction
+		if(self.curr_direction==0) : self.velocity = (0,0)
 		elif(self.curr_direction==1) :
 			ol_rect = self.rect
 			self.image = pygame.transform.rotate(pygame.transform.scale(play,(25,25)),90)
@@ -247,6 +251,7 @@ class Player(pygame.sprite.Sprite):
 		else :
 			self.rect.center  = (self.rect.centerx + self.velocity[0],self.rect.centery + self.velocity[1])
 
+#Enemy class
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
@@ -267,6 +272,7 @@ class Enemy(pygame.sprite.Sprite):
 			i=0
 			continu = True
 			follow = 0
+
 			#Check if player is in front of the player
 			while i<10 or continu :
 				i+=1
@@ -397,7 +403,7 @@ def gameloop():
 					if player.bullets_left>0 :
 						#last_bullet_time = pygame.time.get_ticks()
 						player.bullets_left -= 1
-						bullet = Bullets(player.rect.centerx,player.rect.centery,2*player.velocity[0],2*player.velocity[1])
+						bullet = Bullets(player.rect.centerx,player.rect.centery,4*player.velocity[0],4*player.velocity[1])
 						bullets.add(bullet)
 						all_sprites.add(bullet)
 
@@ -440,24 +446,22 @@ def gameloop():
 		# Set Screen
 		screen.fill(color)
 		screen.blit(background,background_rect)
-		#print(enclosed_enemies)
-		for r in blocked_dots :
-			#print("yes")
+		for r in blocked_dots : #Block all the dot on the screen
 			pygame.draw.rect(screen,BLACK,(r[0]-5,r[1]-5,15,15))
-		if gate_condition==1 :
+		if gate_condition==1 : #Draw the gate if it is open
 			pygame.draw.rect(screen,RED,(216,212,42,9))
-		all_sprites.draw(screen)
+		all_sprites.draw(screen) #Draw all the sprites at their positions
+		
+		#Display the text
 		draw_text(screen,"Dots left : " + str(dots_left),28,Width/6,Height-43)
 		draw_text(screen,"Bullets left : " + str(player.bullets_left),28,Width/2,Height-43)
 		draw_text(screen,"Time for ",18,Width*5/6,Height-43)
-		draw_text(screen,"next bullet : " + str(15 - int((pygame.time.get_ticks()-last_bullet_time)/1000)),18,Width*5/6,Height-24)
+		draw_text(screen,"Next bullet : " + str(15 - int((pygame.time.get_ticks()-last_bullet_time)/1000)),18,Width*5/6,Height-24)
 		
 		#Generate new wave of enemies
 		global allow_next_wave
 		if allow_next_wave :
-			#print("Yes")
 			if pygame.time.get_ticks()>next_wave_time :
-				#print("No")
 				allow_next_wave = False
 				open_gate()
 			draw_text(screen,"Next wave ",18,Width-50,Height/2)
@@ -466,12 +470,11 @@ def gameloop():
 
 		# Do this at last once u r done drawing the entire thing for the frame
 		pygame.display.flip()
-#print("Sorry , The Game is over as you are probably hit by an enemy")
 
-def DrawRect(x,y,w,h,c):
+def DrawRect(x,y,w,h,c): #GUI
 	pygame.draw.rect(screen,c,[x,y,w,h])	
 
-def Button(x,y,string,color,function,w,h):
+def Button(x,y,string,color,function,w,h): #GUI
 	global mouse
 	global click
 	mouse =pygame.mouse.get_pos()
@@ -483,6 +486,7 @@ def Button(x,y,string,color,function,w,h):
 	draw_text(screen,string,(w+h)/8,x+w/2,y)	
 
 
+#Start screen GUI
 intro= True
 while intro:
 	for event in pygame.event.get():
