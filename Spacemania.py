@@ -2,18 +2,7 @@
 import pygame
 import random
 import os
-
-#Set basic constant colour RGB codes
-BLUE = (255,0,0)
-GREEN = (0,255,0)
-RED = (0,0,255)
-BLACK = (0,0,0)
-WHITE = (255,255,255)
-
-#Set basic variables
-Height = 577
-Width = 570
-FPS = 100
+from constants import *
 
 #Hard coded grid or play ground on which the pacman is moving formed using extract.cpp on an image. Here 1 indicates trversible and 0 indiates non-traversible region 
 map =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] ,
@@ -98,7 +87,7 @@ allow_next_wave = False # Flag variable for next wave
 asset_folder = os.path.dirname(__file__);
 
 clock = pygame.time.Clock()
-screen = pygame.display.set_mode((Width,Height))
+screen = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption('Spacemania')
 
 font_name = pygame.font.match_font('arial') #To find the closest possible match to the name 'arial' 
@@ -188,7 +177,7 @@ class Bullets(pygame.sprite.Sprite) :
 				self.kill()
 		self.rect.centery += self.vely #To move the bullet forward in each frame
 		self.rect.centerx += self.velx
-		if self.rect.top < -20 or self.rect.left < 0 or self.rect.right > Width-30 or self.rect.bottom > Height:
+		if self.rect.top < -20 or self.rect.left < 0 or self.rect.right > WIDTH-30 or self.rect.bottom > HEIGHT:
 			explo = Explosion(self.rect.center,20) #Explode the bullet when the bullet reaches the boundary
 			all_sprites.add(explo)
 			self.kill()
@@ -340,8 +329,8 @@ class Enemy(pygame.sprite.Sprite):
 				self.y += self.move[1]
 		self.rect.x += self.velocity[0]
 		self.rect.y += self.velocity[1]
-		if self.rect.top>Height + 10 or self.rect.left < -30 or self.rect.right > Width + 30:
-			self.rect.center = (random.randrange(Width - 30),random.randrange(-100,-40))
+		if self.rect.top>HEIGHT + 10 or self.rect.left < -30 or self.rect.right > WIDTH + 30:
+			self.rect.center = (random.randrange(WIDTH - 30),random.randrange(-100,-40))
 			
 			self.velx = random.randrange(-3,3)
 			self.vely = random.randrange(1,10)
@@ -349,7 +338,7 @@ class Enemy(pygame.sprite.Sprite):
 
 #Load all game graphics
 background = pygame.image.load(os.path.join(asset_folder,"map-with-pane.png"))
-background = pygame.transform.scale(background,(Width,Height))
+background = pygame.transform.scale(background,(WIDTH,HEIGHT))
 meteor = pygame.image.load(os.path.join(asset_folder,"meteorBrown_big3.png"))
 laser = pygame.image.load(os.path.join(asset_folder,"laserRed16.png"))
 play = pygame.image.load(os.path.join(asset_folder,"playerShip1_orange.png"))
@@ -453,10 +442,10 @@ def gameloop():
 		all_sprites.draw(screen) #Draw all the sprites at their positions
 		
 		#Display the text
-		draw_text(screen,"Dots left : " + str(dots_left),28,Width/6,Height-43)
-		draw_text(screen,"Bullets left : " + str(player.bullets_left),28,Width/2,Height-43)
-		draw_text(screen,"Time for ",18,Width*5/6,Height-43)
-		draw_text(screen,"Next bullet : " + str(15 - int((pygame.time.get_ticks()-last_bullet_time)/1000)),18,Width*5/6,Height-24)
+		draw_text(screen,"Dots left : " + str(dots_left),28,WIDTH/6,HEIGHT-43)
+		draw_text(screen,"Bullets left : " + str(player.bullets_left),28,WIDTH/2,HEIGHT-43)
+		draw_text(screen,"Time for ",18,WIDTH*5/6,HEIGHT-43)
+		draw_text(screen,"Next bullet : " + str(15 - int((pygame.time.get_ticks()-last_bullet_time)/1000)),18,WIDTH*5/6,HEIGHT-24)
 		
 		#Generate new wave of enemies
 		global allow_next_wave
@@ -464,8 +453,8 @@ def gameloop():
 			if pygame.time.get_ticks()>next_wave_time :
 				allow_next_wave = False
 				open_gate()
-			draw_text(screen,"Next wave ",18,Width-50,Height/2)
-			draw_text(screen," in : " + str(int((-pygame.time.get_ticks()+next_wave_time)/1000)),18,Width-50,Height/2+20)
+			draw_text(screen,"Next wave ",18,WIDTH-50,HEIGHT/2)
+			draw_text(screen," in : " + str(int((-pygame.time.get_ticks()+next_wave_time)/1000)),18,WIDTH-50,HEIGHT/2+20)
 
 
 		# Do this at last once u r done drawing the entire thing for the frame
@@ -495,9 +484,9 @@ while intro:
 	
 	screen.fill(BLUE)
 	screen.blit(background,background_rect)	
-	Button(100,2*Height/3,"PLAY",GREEN,gameloop,100,75)
-	Button(Width-200,2*Height/3,"QUIT",RED,quit,100,75)
-	draw_text(screen,"SpaceMania",75,Width/2,Height/3-75)
+	Button(100,2*HEIGHT/3,"PLAY",GREEN,gameloop,100,75)
+	Button(WIDTH-200,2*HEIGHT/3,"QUIT",RED,quit,100,75)
+	draw_text(screen,"SpaceMania",75,WIDTH/2,HEIGHT/3-75)
 	pygame.display.flip()
 	clock.tick(FPS)
 pygame.quit()
