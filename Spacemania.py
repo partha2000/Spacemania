@@ -342,6 +342,14 @@ def gameloop():
 			dead = pygame.time.get_ticks()
 			explo = Explosion(player.rect.center,60)
 			all_sprites.add(explo)
+			scorefile = open('highScore.txt', 'r')
+			highScore = scorefile.read()
+			if score > int(highScore):
+				scorefile = open('highScore.txt', 'w')
+				scorefile.write(str(score))
+				scorefile.close()
+			else:
+				scorefile.close()
 			player.kill()
 			run = False
 		if run == False :
@@ -353,7 +361,8 @@ def gameloop():
 				bullet.kill()
 				explo = Explosion(bullet.rect.center,32)
 				all_sprites.add(explo)
-				print("You killed an enemy")
+				score += 1
+				print("You killed an enemy! Your current score is", score)
 		
 		#Check if all the dots have been consumed
 		if dots_left == 0 :
@@ -388,6 +397,7 @@ def gameloop():
 				allow_next_wave = False
 				open_gate()
 			draw_text(screen,"Next wave ",18,WIDTH-50,HEIGHT/2)
+			draw_text(screen,"Score " + str(score),18,WIDTH-50,HEIGHT/2 - 30)
 			draw_text(screen," in : " + str(int((-pygame.time.get_ticks()+next_wave_time)/1000)),18,WIDTH-50,HEIGHT/2+20)
 
 
