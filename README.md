@@ -1,5 +1,7 @@
 # Spacemania
-A game made in python using pygame library
+A game made in python using pygame library.
+Pygame is a library in python used to make games. Beginners can use the library to develop logic
+and polish their programming skills.
 
 PREREQUISITES :
 1. python 2(any version will do but python2.7 is preferred) :
